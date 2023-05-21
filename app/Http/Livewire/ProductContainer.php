@@ -2,16 +2,17 @@
 
 namespace App\Http\Livewire;
 
-use App\Models\Bundle;
+use Carbon\Carbon;
 use App\Models\User;
+use App\Models\Bundle;
 use App\Models\Product;
 use Livewire\Component;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Customer;
 use Illuminate\Support\Arr;
-use PhpOffice\PhpSpreadsheet\Calculation\TextData\Search;
+use Illuminate\Support\Facades\Auth;
 
 use function PHPUnit\Framework\isEmpty;
+use PhpOffice\PhpSpreadsheet\Calculation\TextData\Search;
 
 class ProductContainer extends Component
 {
@@ -77,6 +78,24 @@ class ProductContainer extends Component
 
     public $showBotonRetroceso = true;
 
+    
+
+    //para guardar los clientes
+
+
+    public $searchx = '';
+
+    public $Customers = [];
+
+    public $idCustomer;
+
+    public $Customer;
+   
+    public $mostrarClientes=false;
+
+
+    // fin datos clientes
+
 
     protected $listeners = ['ocultar' => 'ocultar', 'regresar' => 'regresar', 'ocultarBack' => 'ocultarBack'];
 
@@ -100,6 +119,41 @@ class ProductContainer extends Component
        // dd($propertyName);
     } */
 
+    public function abrirClientes()
+    {
+        $this->mostrarClientes=true;
+
+        $this->showGeneral=false;
+    }
+    
+    
+    public function cerrarClientes()
+    {
+        $this->mostrarClientes=false;
+
+        $this->showGeneral=true;
+    }
+
+
+    public function updatedSearchx()
+    {
+
+        $this->Customers = Customer::where('name', 'LIKE', '%' . $this->searchx . '%')->get();
+
+       // $this->emit('ocultarBack');
+    }
+
+
+    public function updatedidCustomer()
+    {
+        $this->Customer = Customer::find($this->idCustomer);  
+
+       // $this->emit('idClienteActual',$this->idCustomer);
+
+      //  $this->save();
+        
+       // dd( $this->Customer);
+    }
 
 
     public function verificarAmount($key)
@@ -511,7 +565,10 @@ class ProductContainer extends Component
 
     public function save()
     {
-
+        $this->emit('idClienteActual',$this->idCustomer);
+        
+        $this->mostrarClientes=false;
+        
         $this->mensajex = '';
 
         $this->showBotonRetroceso = true;
@@ -575,35 +632,7 @@ class ProductContainer extends Component
 
             if (!empty($this->amount[$key])) {
 
-                /* if ($this->amount[$key] < 0) {
-
-                    $this->amount[$key] = 0;
-                }
-
-                if (empty($this->notes[$key]) or $this->notes[$key] < 0) {
-
-                    $this->notes[$key] = 0;
-                }
-
-                if (empty($this->qtyone[$key]) or $this->qtyone[$key] < 0) {
-
-                    $this->qtyone[$key] = 0;
-                }
-
-                if (empty($this->qtytwo[$key]) or $this->qtytwo[$key] < 0) {
-
-                    $this->qtytwo[$key] = 0;
-                }
-
-                if (empty($this->qtythree[$key]) or $this->qtythree[$key] < 0) {
-
-                    $this->qtythree[$key] = 0;
-                }
-
-                
-                $sumaparcial = $this->qtyone[$key] + $this->qtytwo[$key] + $this->qtythree[$key]; */
-
-
+               
                 $finalprice = (float) $this->prices[$key] - (float) $this->notes[$key];
 
 
@@ -638,6 +667,7 @@ class ProductContainer extends Component
                             'finalprice' => $finalprice,
                             'upc' => $miproducto->upc,
                             'pallet' => $miproducto->pallet,
+                            'idCliente' => $this->idCustomer,
                         ]
 
                     ];
@@ -668,10 +698,14 @@ class ProductContainer extends Component
                             'finalprice' => $finalprice,
                             'upc' => $miproducto->upc,
                             'pallet' => $miproducto->pallet,
+                            'idCliente' => $this->idCustomer,
                         ];
 
                         session()->put('carrito', $carrito);
+
                     }
+
+                    
                 } else {
 
 

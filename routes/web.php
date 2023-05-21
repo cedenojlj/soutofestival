@@ -127,3 +127,11 @@ Route::get('rebatemail/{id}', [MailController::class,'rebate'])->name('rebatemai
 
 
 
+
+// Route::get('/versession', function (Request $request) {
+
+//     $data = $request->session()->all();
+
+//     dd($data);
+//     //return $post;
+// });

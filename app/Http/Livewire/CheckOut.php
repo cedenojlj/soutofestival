@@ -79,11 +79,13 @@ class CheckOut extends Component
 
     public $miOrden;
 
+    protected $listeners = ['idClienteActual' => 'actualizarCliente'];
+
 
     protected $rules = [
 
         'idCustomer' => 'required',
-        'email' => 'required|email',        
+        'email' => 'required|email',
         'emailRep' => 'required|email',
         'vendorEmail' => 'required|email',
         'pin' => 'required',
@@ -91,18 +93,35 @@ class CheckOut extends Component
     ];
 
 
-    public function updatedSearchx()
+    // public function updatedSearchx()
+    // {
+
+    //     $this->Customers = Customer::where('name', 'LIKE', '%' . $this->searchx . '%')->get();
+
+    //     $this->emit('ocultarBack');
+    // }
+
+
+    // public function updatedidCustomer()
+    // {
+    //     $this->Customer = Customer::find($this->idCustomer);
+
+    //     $this->email = $this->Customer->email;
+
+    //     $this->email2 = $this->Customer->email2;
+
+    //     $this->emailRep = $this->Customer->emailRep;
+
+    //     $this->vendorEmail = Auth::user()->emailuser;
+    // }
+
+
+    public function actualizarCliente($id)
     {
 
-        $this->Customers = Customer::where('name', 'LIKE', '%' . $this->searchx . '%')->get();
+        $this->idCustomer = $id;
 
-        $this->emit('ocultarBack');
-    }
-
-
-    public function updatedidCustomer()
-    {
-        $this->Customer = Customer::find($this->idCustomer);
+        $this->Customer = Customer::find($id);
 
         $this->email = $this->Customer->email;
 
@@ -111,6 +130,8 @@ class CheckOut extends Component
         $this->emailRep = $this->Customer->emailRep;
 
         $this->vendorEmail = Auth::user()->emailuser;
+
+        // $this->emit('ocultarBack');
     }
 
 
@@ -130,7 +151,6 @@ class CheckOut extends Component
 
                 $this->reset('rebate');
             }
-            
         } else {
 
             $this->reset('rebate');
@@ -144,7 +164,7 @@ class CheckOut extends Component
     public function updatedPin($clave)
     {
 
-        // $this->errores = '';
+        $this->errores = '';
 
         // $miPin = $this->pin;
 
@@ -198,9 +218,11 @@ class CheckOut extends Component
 
                 foreach (session('carrito') as $key => $item) {
 
-                    // $total = $this->total + $item['finalprice'] * $item['amount'];
 
-                    $totalorden = $totalorden + $item['finalprice'] * $item['amount'];
+                    if ($this->idCustomer == $item['idCliente']) {
+
+                        $totalorden = $totalorden + $item['finalprice'] * $item['amount'];
+                    }
                 }
             }
 
@@ -246,47 +268,50 @@ class CheckOut extends Component
 
                 foreach (session('carrito') as $key => $item) {
 
-                    if (empty($item['notes'])) {
+                    if ($this->idCustomer == $item['idCliente']) {
 
-                        $item['notes'] = 0;
+                        if (empty($item['notes'])) {
+
+                            $item['notes'] = 0;
+                        }
+
+                        if (empty($item['qtytwo'])) {
+
+                            $item['qtytwo'] = 0;
+                        }
+
+                        if (empty($item['qtythree'])) {
+
+                            $item['qtythree'] = 0;
+                        }
+
+                        $producto = Product::find($item['id']);
+
+                        $ordersdetail = new Ordersdetail();
+
+                        $ordersdetail->order_id = $this->lastId;
+                        $ordersdetail->product_id =  $item['id'];
+                        // $ordersdetail->name =  $item['name'];
+                        $ordersdetail->name =  $producto->description;
+                        $ordersdetail->itemnumber =  $item['itemnumber'];
+
+                        $ordersdetail->upc =  $producto->upc;
+                        $ordersdetail->pallet =  $producto->pallet;
+                        $ordersdetail->price =   $item['price'];
+
+                        $ordersdetail->amount =  $item['amount'];
+                        $ordersdetail->notes =  $item['notes'];
+                        $ordersdetail->finalprice = $item['finalprice'];
+                        $ordersdetail->qtyone = $item['qtyone'];
+                        $ordersdetail->qtytwo = $item['qtytwo'];
+                        $ordersdetail->qtythree = $item['qtythree'];
+
+                        $ordersdetail->save();
                     }
-
-                    if (empty($item['qtytwo'])) {
-
-                        $item['qtytwo'] = 0;
-                    }
-
-                    if (empty($item['qtythree'])) {
-
-                        $item['qtythree'] = 0;
-                    }
-
-                    $producto = Product::find($item['id']);
-
-                    $ordersdetail = new Ordersdetail();
-
-                    $ordersdetail->order_id = $this->lastId;
-                    $ordersdetail->product_id =  $item['id'];
-                    // $ordersdetail->name =  $item['name'];
-                    $ordersdetail->name =  $producto->description;
-                    $ordersdetail->itemnumber =  $item['itemnumber'];
-
-                    $ordersdetail->upc =  $producto->upc;
-                    $ordersdetail->pallet =  $producto->pallet;
-                    $ordersdetail->price =   $item['price'];
-
-                    $ordersdetail->amount =  $item['amount'];
-                    $ordersdetail->notes =  $item['notes'];
-                    $ordersdetail->finalprice = $item['finalprice'];
-                    $ordersdetail->qtyone = $item['qtyone'];
-                    $ordersdetail->qtytwo = $item['qtytwo'];
-                    $ordersdetail->qtythree = $item['qtythree'];
-
-                    $ordersdetail->save();
                 }
             }
 
-            session()->forget('carrito');
+           // session()->forget('carrito');
 
             //$this->enviandoEmail($order->id);
 
@@ -304,19 +329,15 @@ class CheckOut extends Component
 
             $this->reset('searchx');
 
-            $this->miOrden= Order::find($order->id);
+            $this->miOrden = Order::find($order->id);
 
             if ($this->mostrarOrdenCreada) {
-    
+
                 //dd('entrado a la funcion de envio');
-    
+
                 $this->enviandoEmail($order->id);
             }
         }
-
-       
-
-       
     }
 
 
@@ -338,8 +359,6 @@ class CheckOut extends Component
 
                 $this->rebateMail($id);
             }
-
-
         } catch (\Throwable $th) {
 
             report($th);

@@ -41,7 +41,6 @@
 
     </div>
 
-
     <div class="text-center mb-4">
         <div wire:loading.inline-flex>
 
@@ -65,13 +64,12 @@
 
                     {{-- <h5>{{Auth::user()->name}}</h5> --}}
 
-                    <h5>Search Customer:</h5>
-
                     <livewire:check-out />
 
                     @if ($showBotonRetroceso)
 
-                    <button type="button" wire:click="regresar" name="" id="" class="btn btn-primary">Back</button>
+                    {{-- <button type="button" wire:click="regresar" name="" id="" class="btn btn-primary">Back</button>
+                    --}}
 
                     @endif
 
@@ -94,167 +92,225 @@
     @endif
 
 
+    @if ($mostrarClientes)
+
+    <div class="row justify-content-center mb-4 mt-2">
+
+        {{-- Para guardar el id del cliente --}}
+
+        <div class="col-md-6">
+
+            <div class="card">
+
+                <div class="card-header">Add Customer</div>
+
+                <div class="card-body justify-content-center">
+
+                    <div class="col-md-12 mt-2">
+
+                        <input type="text" class="col form-control" wire:model="searchx" autocomplete="off">
+
+                    </div>
+
+
+                    <div class="col-md-12 mt-4">
+
+                        <select wire:model="idCustomer" class="form-select @error('idCustomer') is-invalid @enderror"
+                            aria-label="Default select example">
+
+                            <option selected>Open this select menu</option>
+
+                            @foreach ($Customers as $item)
+
+                            <option value="{{$item->id}}">{{$item->name}}</option>
+
+                            @endforeach
+
+                        </select>
+
+                        @error('idCustomer')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                        @enderror
+
+                    </div>                    
+
+                    <div class="col-6 offset-md-5 mt-4">
+                        <button type="button" wire:click="save" name="" id="" class="btn btn-primary">Next</button>
+
+                        <button type="button" wire:click="cerrarClientes" name="" id=""
+                            class="btn btn-primary">Close</button>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    @endif
+
 
     @if ($showGeneral)
 
+        {{-- Add Form Items --}}
 
-    {{-- Add Form Items --}}
+        @if ($showFormItems)
 
-    @if ($showFormItems)
+        <div class="row justify-content-center">
 
-    <div class="row justify-content-center">
+            <div class="col-md-8">
 
-        <div class="col-md-8">
+                <div class="card">
 
-            <div class="card">
+                    <div class="card-header">Add Items</div>
 
-                <div class="card-header">Add Items</div>
+                    <div class="card-body">
 
-                <div class="card-body">
+                        {{-- Boton buscar --}}
 
-                    {{-- Boton buscar --}}
+                        <div class="row mb-3 justify-content-center">
 
-                    <div class="row mb-3 justify-content-center">
+                            <label for="search" class="col-sm-6 col-md-2 col-form-label text-md-end">Search:</label>
 
-                        <label for="search" class="col-sm-6 col-md-2 col-form-label text-md-end">Search:</label>
+                            <div class="col-sm-6 col-md-6">
 
-                        <div class="col-sm-6 col-md-6">
+                                <input wire:model="search" class="form-control" type="text"
+                                    placeholder="Search Product code or name..." />
 
-                            <input wire:model="search" class="form-control" type="text"
-                                placeholder="Search Product code or name..." />
-
-                        </div>
-                    </div>
-
-
-                    {{-- Boton select --}}
-
-                    <div class="row mb-3 justify-content-center">
-
-                        <label for="idProduct" class="col-sm-6 col-md-2 col-form-label text-md-end">Product:</label>
-
-                        <div class="col-sm-6 col-md-6">
-
-                            <select wire:model="idProduct" class="form-select @error('idProduct') is-invalid @enderror"
-                                aria-label="Default select example">
-
-                                <option selected>Open this select menu</option>
-
-                                @foreach ($listaProductos as $item)
-
-                                <option value="{{$item->id}}">{{$item->itemnumber.' '.$item->name}}</option>
-
-                                @endforeach
-
-                            </select>
-
-                            @error('idProduct')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                            @enderror
-
+                            </div>
                         </div>
 
-                    </div>
 
+                        {{-- Boton select --}}
 
-                    {{-- Boton agregar --}}
+                        <div class="row mb-3 justify-content-center">
 
-                    <div class="row justify-content-center ">
+                            <label for="idProduct" class="col-sm-6 col-md-2 col-form-label text-md-end">Product:</label>
 
+                            <div class="col-sm-6 col-md-6">
 
-                        <div class="col-sm-auto col-md-auto">
+                                <select wire:model="idProduct" class="form-select @error('idProduct') is-invalid @enderror"
+                                    aria-label="Default select example">
 
-                            <button type="button" wire:click="saveItem" name="" id=""
-                                class="btn btn-primary">Add</button>
+                                    <option selected>Open this select menu</option>
 
-                            <button type="button" wire:click="closeItem" name="" id=""
-                                class="btn btn-primary">Close</button>
+                                    @foreach ($listaProductos as $item)
 
+                                    <option value="{{$item->id}}">{{$item->itemnumber.' '.$item->name}}</option>
+
+                                    @endforeach
+
+                                </select>
+
+                                @error('idProduct')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+
+                            </div>
 
                         </div>
 
 
+                        {{-- Boton agregar --}}
+
+                        <div class="row justify-content-center ">
+
+
+                            <div class="col-sm-auto col-md-auto">
+
+                                <button type="button" wire:click="saveItem" name="" id=""
+                                    class="btn btn-primary">Add</button>
+
+                                <button type="button" wire:click="closeItem" name="" id=""
+                                    class="btn btn-primary">Close</button>
+
+
+                            </div>
+
+
+                        </div>
+
+
                     </div>
-
-
                 </div>
             </div>
         </div>
-    </div>
 
-    @endif
+        @endif
 
-    {{-- Add Form Bundle --}}
+        {{-- Add Form Bundle --}}
 
-    @if ($showFormItemsBundle)
+        @if ($showFormItemsBundle)
 
-    <div class="row justify-content-center mt-4">
+        <div class="row justify-content-center mt-4">
 
-        <div class="col-md-8">
+            <div class="col-md-8">
 
-            <div class="card">
+                <div class="card">
 
-                <div class="card-header">Add Bundles</div>
+                    <div class="card-header">Add Bundles</div>
 
-                <div class="card-body">
+                    <div class="card-body">
 
 
-                    {{-- Boton select --}}
+                        {{-- Boton select --}}
 
-                    <div class="row mb-3 justify-content-center">
+                        <div class="row mb-3 justify-content-center">
 
-                        <label for="idProductBundle"
-                            class="col-sm-6 col-md-2 col-form-label text-md-end">Product:</label>
+                            <label for="idProductBundle"
+                                class="col-sm-6 col-md-2 col-form-label text-md-end">Product:</label>
 
-                        <div class="col-sm-6 col-md-4">
+                            <div class="col-sm-6 col-md-4">
 
-                            <select wire:model="idProductBundle"
-                                class="form-select @error('idProductBundle') is-invalid @enderror"
-                                aria-label="Default select example">
+                                <select wire:model="idProductBundle"
+                                    class="form-select @error('idProductBundle') is-invalid @enderror"
+                                    aria-label="Default select example">
 
-                                <option selected>Open this select menu</option>
+                                    <option selected>Open this select menu</option>
 
-                                <option value="1">Bundle 1</option>
-                                <option value="2">Bundle 2</option>
-                                <option value="3">Bundle 3</option>
-                                <option value="4">Bundle 4</option>
-                                <option value="5">Bundle 5</option>
+                                    <option value="1">Bundle 1</option>
+                                    <option value="2">Bundle 2</option>
+                                    <option value="3">Bundle 3</option>
+                                    <option value="4">Bundle 4</option>
+                                    <option value="5">Bundle 5</option>
 
-                            </select>
+                                </select>
 
-                            @error('idProductBundle')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                            @enderror
+                                @error('idProductBundle')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+
+                            </div>
+
+                        </div>
+
+                        <div class="row mb-3 justify-content-center">
+
+                            <div class="col-sm-auto col-md-auto">
+
+                                <button type="button" wire:click="saveItemBundle" name="" id=""
+                                    class="btn btn-primary">Add</button>
+
+                                <button type="button" wire:click="closeItemBundle" name="" id=""
+                                    class="btn btn-primary">Close</button>
+
+                            </div>
 
                         </div>
 
                     </div>
-
-                    <div class="row mb-3 justify-content-center">
-
-                        <div class="col-sm-auto col-md-auto">
-
-                            <button type="button" wire:click="saveItemBundle" name="" id=""
-                                class="btn btn-primary">Add</button>
-
-                            <button type="button" wire:click="closeItemBundle" name="" id=""
-                                class="btn btn-primary">Close</button>
-
-                        </div>
-
-                    </div>
-
                 </div>
             </div>
         </div>
-    </div>
 
-    @endif
-
+        @endif
 
     {{-- <div wire:loading.inline-flex wire:target="save"> --}}
 
@@ -279,7 +335,9 @@
 
                     <div class="col col-md-1">
 
-                        <button type="button" wire:click="save" name="" id="" class="btn btn-primary">Checkout</button>
+                        {{-- <button type="button" wire:click="save" name="" id="" class="btn btn-primary">Checkout</button> --}}
+
+                        <button type="button" wire:click="abrirClientes" name="" id="" class="btn btn-primary">Checkout</button>
 
                     </div>
 
@@ -455,13 +513,11 @@
 
         </div>
 
-
-
-
-
         @endif
 
 
-        @endif
+    @endif
 
     </div>
+
+    

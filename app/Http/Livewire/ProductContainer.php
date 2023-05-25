@@ -210,13 +210,35 @@ class ProductContainer extends Component
         if (($value <= 0)) {
 
             $this->amount[$key] = '';
+
+            $carrito = session()->get('carrito');
+          
+            if (isset($carrito) and isset($carrito[$key]) and $carrito[$key]['idCliente'] == $this->idCustomer) {
+
+               unset($carrito[$key]);
+
+               session()->put('carrito', $carrito);
+
+           }
+
+         //dd($carrito);
+
+
         } elseif ($value > 99999) {
 
             $this->amount[$key] = 99999;
+
         } else {
 
             $this->amount[$key] = $value;
         }
+
+
+
+
+
+
+
     }
 
     public function updatedQtyone($value, $key)
@@ -565,7 +587,8 @@ class ProductContainer extends Component
 
     public function save()
     {
-        $this->emit('idClienteActual',$this->idCustomer);
+       
+       // $this->quitarItemsPorCliente();
         
         $this->mostrarClientes=false;
         
@@ -577,7 +600,8 @@ class ProductContainer extends Component
 
             return false;
         }
-        // dd(count($this->items));
+        
+        //dd(count($this->items));
 
         //session()->forget('carrito');
 
@@ -587,10 +611,9 @@ class ProductContainer extends Component
 
         $itemValidos = 0;
 
-       // dd($this->items);
+       //dd($this->items);
 
-        foreach ($this->items as $key => $value) {
-
+        foreach ($this->items as $key => $value) {          
 
             /*if (empty($this->amount[$key]) or $this->amount[$key] < 0) {
 
@@ -629,100 +652,108 @@ class ProductContainer extends Component
                 $this->indicador[$key] = 'table-danger';
             }
 
+            // if (empty($this->amount[$key])) {
 
-            if (!empty($this->amount[$key])) {
+            //     continue;
+            // }
+                          
+                if (!empty($this->amount[$key])) {
 
-               
-                $finalprice = (float) $this->prices[$key] - (float) $this->notes[$key];
-
-
-                if ($sumaparcial == $this->amount[$key] and $this->amount[$key] > 0) {
-
-
-
-                    // $this->mierror = false;
-                    $this->indicador[$key] = 'table-success';
-
-                    //$proceder = true;
-                    $miproducto = Product::find($value['id']);
-
-                    //******************************************* */
-
-                    $itemValidos = $itemValidos + 1;
-
-                    $item = [
-
-                        $key => [
-
-                            'id' => $value['id'],
-                            'name' => $value['name'],
-                            'itemnumber' => $value['itemnumber'],
-                            'price' => $value['price'],
-                            //'price' =>(float) $this->prices[$key],
-                            'amount' => $this->amount[$key],
-                            'notes' => (float) $this->notes[$key],
-                            'qtyone' => $this->qtyone[$key],
-                            'qtytwo' => $this->qtytwo[$key],
-                            'qtythree' => $this->qtythree[$key],
-                            'finalprice' => $finalprice,
-                            'upc' => $miproducto->upc,
-                            'pallet' => $miproducto->pallet,
-                            'idCliente' => $this->idCustomer,
-                        ]
-
-                    ];
-
-                    $carrito = session()->get('carrito');
-
-                    if (!$carrito) {
+                
+                    $finalprice = (float) $this->prices[$key] - (float) $this->notes[$key];
 
 
-                        session()->put('carrito', $item);
+                    if ($sumaparcial == $this->amount[$key] and $this->amount[$key] > 0) {
+
+
+
+                        // $this->mierror = false;
+                        $this->indicador[$key] = 'table-success';
+
+                        //$proceder = true;
+                        $miproducto = Product::find($value['id']);
+
+                        //******************************************* */
+
+                        $itemValidos = $itemValidos + 1;
+
+                        $item = [
+
+                            $key => [
+
+                                'id' => $value['id'],
+                                'name' => $value['name'],
+                                'itemnumber' => $value['itemnumber'],
+                                'price' => $value['price'],
+                                //'price' =>(float) $this->prices[$key],
+                                'amount' => $this->amount[$key],
+                                'notes' => (float) $this->notes[$key],
+                                'qtyone' => $this->qtyone[$key],
+                                'qtytwo' => $this->qtytwo[$key],
+                                'qtythree' => $this->qtythree[$key],
+                                'finalprice' => $finalprice,
+                                'upc' => $miproducto->upc,
+                                'pallet' => $miproducto->pallet,
+                                'idCliente' => $this->idCustomer,
+                            ]
+
+                        ];
+
+                        $carrito = session()->get('carrito');
+
+                        if (!$carrito) {
+
+
+                            session()->put('carrito', $item);
+
+                            
+                        } else {
+
+                            $carrito[$key] = [
+
+
+                                'id' => $value['id'],
+                                'name' => $value['name'],
+                                'itemnumber' => $value['itemnumber'],
+                                'price' => $value['price'],
+                                // 'price' =>(float) $this->prices[$key],
+                                'amount' => $this->amount[$key],
+                                'notes' => $this->notes[$key],
+                                'qtyone' => $this->qtyone[$key],
+                                'qtytwo' => $this->qtytwo[$key],
+                                'qtythree' => $this->qtythree[$key],
+                                'finalprice' => $finalprice,
+                                'upc' => $miproducto->upc,
+                                'pallet' => $miproducto->pallet,
+                                'idCliente' => $this->idCustomer,
+                            ];
+
+                            session()->put('carrito', $carrito);
+
+                        }
 
                         
                     } else {
 
-                        $carrito[$key] = [
+
+                        $this->mierror = true;
+                        $this->indicador[$key] = 'table-danger';
+
+                        $errores = $errores + 1;
 
 
-                            'id' => $value['id'],
-                            'name' => $value['name'],
-                            'itemnumber' => $value['itemnumber'],
-                            'price' => $value['price'],
-                            // 'price' =>(float) $this->prices[$key],
-                            'amount' => $this->amount[$key],
-                            'notes' => $this->notes[$key],
-                            'qtyone' => $this->qtyone[$key],
-                            'qtytwo' => $this->qtytwo[$key],
-                            'qtythree' => $this->qtythree[$key],
-                            'finalprice' => $finalprice,
-                            'upc' => $miproducto->upc,
-                            'pallet' => $miproducto->pallet,
-                            'idCliente' => $this->idCustomer,
-                        ];
-
-                        session()->put('carrito', $carrito);
-
+                        # code...
                     }
 
-                    
-                } else {
-
-
-                    $this->mierror = true;
-                    $this->indicador[$key] = 'table-danger';
-
-                    $errores = $errores + 1;
-
-
-                    # code...
+                    # code..
                 }
-
-                # code..
-            }
-
+                    
            
         }
+
+        //dump($this->amount[0]);
+
+      // dd($carrito);
 
         //limpiar value
 
@@ -756,6 +787,8 @@ class ProductContainer extends Component
         $this->showGeneral = false;
 
         $this->mensajex = '';
+
+        $this->emit('idClienteActual',$this->idCustomer);
 
 
         /*  if ($this->mierror) {
@@ -806,6 +839,36 @@ class ProductContainer extends Component
         $this->showBotonRetroceso = false;
     }
 
+
+    public function quitarItemsPorCliente()
+    {
+
+        $carrito = session()->get('carrito');
+
+      // dd($carrito);
+
+        if (isset($carrito) and $this->idCustomer>0) {
+           
+            
+            foreach ($carrito as $key => $value) {
+
+                if ($carrito[$key]['idCliente'] == $this->idCustomer) {
+
+                    unset($carrito[$key]);
+                    
+                }
+                
+            }
+
+
+        }
+
+
+   // dd($carrito);
+        
+    }
+
+
     public function render()
     {
         $user = User::find(Auth::id());
@@ -818,5 +881,7 @@ class ProductContainer extends Component
         ]);
     }
 }
+
+
 
 

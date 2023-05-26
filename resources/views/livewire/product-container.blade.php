@@ -19,19 +19,19 @@
             @if ($mensajex)
 
 
-            @if ($mierror)
+                @if ($mierror)
 
-            <div class="alert alert-danger" role="alert">
-                {{$mensajex}}
-            </div>
+                <div class="alert alert-danger" role="alert">
+                    {{$mensajex}}
+                </div>
 
-            @else
+                @else
 
-            <div class="alert alert-success" role="alert">
-                {{$mensajex}}
-            </div>
+                <div class="alert alert-success" role="alert">
+                    {{$mensajex}}
+                </div>
 
-            @endif
+                @endif
 
 
             @endif
@@ -337,7 +337,7 @@
 
                         {{-- <button type="button" wire:click="save" name="" id="" class="btn btn-primary">Checkout</button> --}}
 
-                        <button type="button" wire:click="abrirClientes" name="" id="" class="btn btn-primary">Checkout</button>
+                        <button type="button" wire:click="revisarItems" name="" id="" class="btn btn-primary">Checkout</button>
 
                     </div>
 

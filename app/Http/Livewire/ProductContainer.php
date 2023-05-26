@@ -121,6 +121,7 @@ class ProductContainer extends Component
 
     public function abrirClientes()
     {
+               
         $this->mostrarClientes=true;
 
         $this->showGeneral=false;
@@ -880,6 +881,129 @@ class ProductContainer extends Component
             'fecha3' => Carbon::createFromFormat('Y-m-d', $user->date3)->format('m/d/Y')
         ]);
     }
+
+
+
+    public function revisarItems()
+    {
+        // para revisar si los datos estan correctos y proceder a la creacionde la orden
+
+        $this->mensajex = '';
+
+        $errores = 0;
+
+        $itemValidos = 0;
+
+        if (empty($this->items)) {
+
+            return false;
+        }
+
+
+        foreach ($this->items as $key => $value) {
+
+
+            if (empty($this->notes[$key]) or $this->notes[$key] < 0) {
+
+                $this->notes[$key] = 0;
+            }
+
+            if (empty($this->qtyone[$key]) or $this->qtyone[$key] < 0) {
+
+                $this->qtyone[$key] = 0;
+            }
+
+            if (empty($this->qtytwo[$key]) or $this->qtytwo[$key] < 0) {
+
+                $this->qtytwo[$key] = 0;
+            }
+
+            if (empty($this->qtythree[$key]) or $this->qtythree[$key] < 0) {
+
+                $this->qtythree[$key] = 0;
+            }
+
+            $sumaparcial = $this->qtyone[$key] + $this->qtytwo[$key] + $this->qtythree[$key];
+
+
+            if (empty($this->amount[$key]) and $sumaparcial > 0) {
+
+                $errores = $errores + 1;
+
+                $this->mierror = true;
+
+                $this->indicador[$key] = 'table-danger';
+            }
+
+
+
+            if (!empty($this->amount[$key])) {
+
+
+                if ($sumaparcial == $this->amount[$key] and $this->amount[$key] > 0) {
+
+                    $itemValidos = $itemValidos + 1;
+
+                    $this->indicador[$key] = 'table-success';
+
+                }
+                
+                
+                if ($sumaparcial != $this->amount[$key] and $this->amount[$key] > 0) {                    
+                    
+                    $errores = $errores + 1;
+    
+                    $this->mierror = true;
+    
+                    $this->indicador[$key] = 'table-danger';
+
+                }
+
+                
+            }          
+
+           
+        }
+
+        if ($errores > 0) {
+
+            $this->mensajex = 'The quantity must be equal to 
+            the sum of the quantity One, two and three, only valid items were added';
+
+            return false;
+            # code...
+        }
+
+        if ($itemValidos == 0) {
+
+            $this->mensajex = 'You must select an item';
+
+            $this->mierror = true;
+
+            return false;
+        }
+
+
+        if ($itemValidos > 0 and empty($errores)) {
+           
+            $this->mensajex = '';
+
+            $this->mierror = false;
+            
+            $this->mostrarClientes=true;
+
+            $this->showGeneral=false;
+            
+        }
+
+
+       
+
+
+
+    }
+
+
 }
 
 
